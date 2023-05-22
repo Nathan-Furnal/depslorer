@@ -1,0 +1,34 @@
+* Motivation
+When working on medium to large projects, it's not rare to have dependencies that were needed at
+some point but aren't required anymore, still lying around. This is an attempt to find them.
+* Usage
+This small CLI tool is meant to be used inside the virtual environment of an existing project. You
+can run the following command:
+#+begin_src sh :eval no
+# -f -> --filenames
+# -r -> --recursive
+# -d -> --depfiles
+python cli.py -f . -r true -d examples/example.toml
+#+end_src
+and it will go through your installed packages and compare them to your imports. If any of the
+installed packages is not used, you'll see something like:
+#+begin_example
+'pandas' is probably unused.
+'scipy' is probably unused.
+#+end_example
+written in the console.
+
+Since packages do not have specific knowledge about being installed as a top-level package or as a
+dependency, you can add any number of =--depfiles= that will limit the warnings to explicitly
+installed packages from those files; with YAML, TOML and text being valid extensions. If no
+dependency files are passed to the CLI, then you'll be warned about *all* packages not currently in
+use, which is potentially quite a lot.
+
+* Limitations
+
+This tool is a hack to quickly find unused dependencies and it will fail if a package is not
+installed the 'proper' way. For example, installing with =pip git+https...= works fine but cloning a
+project and then =pip -e install='ing it, means that it won't be discoverable.
+
+Also, packages that are required but not imported (like database drivers) but we found since there
+is no import statement in the code referring to those packages.
